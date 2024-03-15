@@ -3,8 +3,8 @@ defmodule RealworldPhoenix.Repo.Migrations.CreateComments do
 
   def change do
     create table(:comments) do
-      add :body, :text
-      add :article_id, references(:articles, on_delete: :nothing)
+      add :body, :text, null: false
+      add :article_id, references(:articles, on_delete: :nothing), null: false
 
       timestamps(type: :utc_datetime)
     end
