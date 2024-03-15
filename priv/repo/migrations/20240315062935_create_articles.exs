@@ -3,8 +3,8 @@ defmodule RealworldPhoenix.Repo.Migrations.CreateArticles do
 
   def change do
     create table(:articles) do
-      add :title, :string
-      add :body, :text
+      add :title, :string, null: false
+      add :body, :text, null: false
 
       timestamps(type: :utc_datetime)
     end
