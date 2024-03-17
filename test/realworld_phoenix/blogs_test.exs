@@ -7,6 +7,7 @@ defmodule RealworldPhoenix.BlogsTest do
     alias RealworldPhoenix.Blogs.Article
 
     import RealworldPhoenix.BlogsFixtures
+    import RealworldPhoenix.AccountsFixtures
 
     @invalid_attrs %{title: nil, body: nil}
 
@@ -47,7 +48,11 @@ defmodule RealworldPhoenix.BlogsTest do
     end
 
     test "create_article/1 with valid data creates a article" do
-      valid_attrs = %{title: "some title", body: "some body"}
+      valid_attrs = %{
+        title: "some title",
+        body: "some body",
+        author_id: user_fixture().id
+      }
 
       assert {:ok, %Article{} = article} = Blogs.create_article(valid_attrs)
       assert article.title == "some title"
