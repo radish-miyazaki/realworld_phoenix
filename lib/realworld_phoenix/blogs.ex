@@ -21,6 +21,11 @@ defmodule RealworldPhoenix.Blogs do
     Repo.all(Article) |> Repo.preload(:tags)
   end
 
+  def list_articles_by_tag(tag_name) do
+    query = from a in Article, join: t in assoc(a, :tags), on: t.tag == ^tag_name
+    Repo.all(query) |> Repo.preload(:tags)
+  end
+
   @doc """
   Gets a single article.
 
@@ -305,14 +310,14 @@ defmodule RealworldPhoenix.Blogs do
     |> Ecto.Multi.run(:tags, fn _repo, _changes ->
       insert_and_get_all(attrs)
     end)
-    |> Ecto.Multi.run(:article, fn _repp, changes ->
+    |> Ecto.Multi.run(:article, fn _repo, changes ->
       insert_or_update_artice(article, attrs, changes)
     end)
     |> Repo.transaction()
   end
 
   defp insert_and_get_all(attrs) do
-    case Tag.parse(attrs[:tag_string] || attrs["tags_string"]) do
+    case Tag.parse(attrs[:tags_string] || attrs["tags_string"]) do
       [] ->
         {:ok, []}
 
