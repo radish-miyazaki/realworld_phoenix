@@ -4,6 +4,8 @@ defmodule RealworldPhoenix.BlogsFixtures do
   entities via the `RealworldPhoenix.Blogs` context.
   """
 
+  import RealworldPhoenix.AccountsFixtures
+
   @doc """
   Generate a article.
   """
@@ -12,7 +14,8 @@ defmodule RealworldPhoenix.BlogsFixtures do
       attrs
       |> Enum.into(%{
         body: "some body",
-        title: "some title"
+        title: "some title",
+        author_id: user_fixture().id
       })
       |> RealworldPhoenix.Blogs.create_article()
 
