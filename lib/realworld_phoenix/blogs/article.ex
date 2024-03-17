@@ -2,6 +2,7 @@ defmodule RealworldPhoenix.Blogs.Article do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Blogs.ArticleTag
   alias RealworldPhoenix.Blogs.Comment
   alias RealworldPhoenix.Blogs.Tag
@@ -9,6 +10,7 @@ defmodule RealworldPhoenix.Blogs.Article do
   schema "articles" do
     field :title, :string
     field :body, :string
+    belongs_to :author, User
     has_many :comments, Comment, on_delete: :delete_all
 
     many_to_many :tags, Tag,
@@ -24,8 +26,8 @@ defmodule RealworldPhoenix.Blogs.Article do
   @doc false
   def changeset(article, attrs, tags \\ []) do
     article
-    |> cast(attrs, [:title, :body])
-    |> validate_required([:title, :body])
+    |> cast(attrs, [:title, :body, :author_id])
+    |> validate_required([:title, :body, :author_id])
     |> put_assoc(:tags, tags)
   end
 end
