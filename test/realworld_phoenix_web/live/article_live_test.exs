@@ -3,6 +3,7 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
 
   import Phoenix.LiveViewTest
   import RealworldPhoenix.BlogsFixtures
+  import RealworldPhoenix.AccountsFixtures
 
   @create_attrs %{title: "some title", body: "some body"}
   @update_attrs %{title: "some updated title", body: "some updated body"}
@@ -24,13 +25,14 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
     end
 
     test "saves new article", %{conn: conn} do
-      {:ok, show_live, _html} =
+      {:ok, index_live, _html} =
         conn
-        |> log_in_user(RealworldPhoenix.Repo.preload(article, :author).author)
-        |> live(~p"/articles/#{article}")
+        |> log_in_user(user_fixture())
+        |> live(~p"/articles")
 
-      assert index_live |> element("a", "New Article") |> render_click() =~
-               "New Article"
+      assert index_live
+             |> element("a", "New Article")
+             |> render_click() =~ "New Article"
 
       assert_patch(index_live, ~p"/articles/new")
 
@@ -54,18 +56,19 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
     setup [:create_article]
 
     test "displays article", %{conn: conn, article: article} do
-      {:ok, _show_live, html} = live(conn, ~p"/articles/#{article}")
+      {:ok, _show_live, html} =
+        conn
+        |> log_in_user(RealworldPhoenix.Repo.preload(article, :author).author)
+        |> live(~p"/articles/#{article}")
 
       assert html =~ "Show Article"
       assert html =~ article.title
     end
 
     test "updates article within modal", %{conn: conn, article: article} do
-      {:ok, show_live, _html} = live(conn, ~p"/articles/#{article}")
-
       {:ok, show_live, _html} =
         conn
-        |> log_in_user(conn, RealworldPhoenix.Repo.preload(article, :author).id)
+        |> log_in_user(RealworldPhoenix.Repo.preload(article, :author).author)
         |> live(~p"/articles/#{article}")
 
       assert show_live |> element("a", "Edit") |> render_click() =~
@@ -91,7 +94,7 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
     test "deletes article", %{conn: conn, article: article} do
       {:ok, show_live, _html} =
         conn
-        |> log_in_user(conn, RealworldPhoenix.Repo.preload(article, :author).id)
+        |> log_in_user(RealworldPhoenix.Repo.preload(article, :author).author)
         |> live(~p"/articles/#{article}")
 
       assert show_live |> element("a", "Delete") |> render_click()
