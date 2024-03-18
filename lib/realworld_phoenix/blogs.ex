@@ -41,7 +41,7 @@ defmodule RealworldPhoenix.Blogs do
 
   """
   def get_article!(id) do
-    Repo.get(Article, id) |> Repo.preload(:tags)
+    Repo.get!(Article, id) |> Repo.preload(:tags)
   end
 
   @doc """
@@ -308,7 +308,7 @@ defmodule RealworldPhoenix.Blogs do
   def insert_or_update_article_with_tags(article, attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:tags, fn _repo, _changes ->
-      insert_and_get_all(attrs)
+      insert_and_get_all_tags(attrs)
     end)
     |> Ecto.Multi.run(:article, fn _repo, changes ->
       insert_or_update_artice(article, attrs, changes)
@@ -316,7 +316,7 @@ defmodule RealworldPhoenix.Blogs do
     |> Repo.transaction()
   end
 
-  defp insert_and_get_all(attrs) do
+  defp insert_and_get_all_tags(attrs) do
     case Tag.parse(attrs[:tags_string] || attrs["tags_string"]) do
       [] ->
         {:ok, []}
