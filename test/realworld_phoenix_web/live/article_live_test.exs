@@ -24,7 +24,10 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
     end
 
     test "saves new article", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
+      {:ok, show_live, _html} =
+        conn
+        |> log_in_user(RealworldPhoenix.Repo.preload(article, :author).author)
+        |> live(~p"/articles/#{article}")
 
       assert index_live |> element("a", "New Article") |> render_click() =~
                "New Article"
@@ -45,36 +48,6 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
       assert html =~ "Article created successfully"
       assert html =~ "some title"
     end
-
-    test "updates article in listing", %{conn: conn, article: article} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
-
-      assert index_live |> element("#articles-#{article.id} a", "Edit") |> render_click() =~
-               "Edit Article"
-
-      assert_patch(index_live, ~p"/articles/#{article}/edit")
-
-      assert index_live
-             |> form("#article-form", article: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert index_live
-             |> form("#article-form", article: @update_attrs)
-             |> render_submit()
-
-      assert_patch(index_live, ~p"/articles")
-
-      html = render(index_live)
-      assert html =~ "Article updated successfully"
-      assert html =~ "some updated title"
-    end
-
-    test "deletes article in listing", %{conn: conn, article: article} do
-      {:ok, index_live, _html} = live(conn, ~p"/articles")
-
-      assert index_live |> element("#articles-#{article.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#articles-#{article.id}")
-    end
   end
 
   describe "Show" do
@@ -89,6 +62,11 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
 
     test "updates article within modal", %{conn: conn, article: article} do
       {:ok, show_live, _html} = live(conn, ~p"/articles/#{article}")
+
+      {:ok, show_live, _html} =
+        conn
+        |> log_in_user(conn, RealworldPhoenix.Repo.preload(article, :author).id)
+        |> live(~p"/articles/#{article}")
 
       assert show_live |> element("a", "Edit") |> render_click() =~
                "Edit Article"
@@ -108,6 +86,21 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
       html = render(show_live)
       assert html =~ "Article updated successfully"
       assert html =~ "some updated title"
+    end
+
+    test "deletes article", %{conn: conn, article: article} do
+      {:ok, show_live, _html} =
+        conn
+        |> log_in_user(conn, RealworldPhoenix.Repo.preload(article, :author).id)
+        |> live(~p"/articles/#{article}")
+
+      assert show_live |> element("a", "Delete") |> render_click()
+      assert_redirect(show_live, ~p"/articles")
+
+      {:ok, _index_live, html} = live(conn, ~p"/articles")
+
+      # 削除した記事が一覧に表示されていないことを確認
+      refute html =~ "/articles/#{article.id}"
     end
   end
 end
