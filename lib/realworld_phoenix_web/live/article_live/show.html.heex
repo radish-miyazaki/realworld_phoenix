@@ -1,9 +1,12 @@
 <.header>
   Article <%= @article.id %>
   <:subtitle>This is a article record from your database.</:subtitle>
-  <:actions>
+  <:actions :if={@current_user && @current_user.id == @article.author.id}>
     <.link patch={~p"/articles/#{@article}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit article</.button>
+    </.link>
+    <.link phx-click={JS.push("delete")} data-confirm="Are you sure?">
+      <.button>Delete article</.button>
     </.link>
   </:actions>
 </.header>
@@ -15,7 +18,12 @@
 
 <.back navigate={~p"/articles"}>Back to articles</.back>
 
-<.modal :if={@live_action == :edit} id="article-modal" show on_cancel={JS.patch(~p"/articles/#{@article}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="article-modal"
+  show
+  on_cancel={JS.patch(~p"/articles/#{@article}")}
+>
   <.live_component
     module={RealworldPhoenixWeb.ArticleLive.FormComponent}
     id={@article.id}
