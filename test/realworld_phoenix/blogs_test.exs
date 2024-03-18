@@ -21,14 +21,16 @@ defmodule RealworldPhoenix.BlogsTest do
         Blogs.insert_article_with_tags(%{
           title: "t",
           body: "b",
-          tags_string: "Elixir, Phoenix, Nerves, Nx"
+          tags_string: "Elixir, Phoenix, Nerves, Nx",
+          author_id: user_fixture().id
         })
 
       {:ok, %{article: a2}} =
         Blogs.insert_article_with_tags(%{
           title: "t",
           body: "b",
-          tags_string: "Elixir"
+          tags_string: "Elixir",
+          author_id: user_fixture().id
         })
 
       assert Blogs.list_articles_by_tag("Elixir")
@@ -94,6 +96,7 @@ defmodule RealworldPhoenix.BlogsTest do
     alias RealworldPhoenix.Blogs.Comment
 
     import RealworldPhoenix.BlogsFixtures
+    import RealworldPhoenix.AccountsFixtures
 
     @invalid_attrs %{body: nil}
 
