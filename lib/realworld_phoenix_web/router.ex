@@ -1,8 +1,9 @@
 defmodule RealworldPhoenixWeb.Router do
-  alias RealworldPhoenixWeb.ArticleLive
   use RealworldPhoenixWeb, :router
 
   import RealworldPhoenixWeb.UserAuth
+
+  alias RealworldPhoenixWeb.ArticleLive
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -22,12 +23,6 @@ defmodule RealworldPhoenixWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-
-    live "/articles", ArticleLive.Index, :index
-    live "/articles/new", ArticleLive.Index, :new
-    live "/articles/:id/edit", ArticleLive.Index, :edit
-    live "/articles/:id", ArticleLive.Index, :show
-    live "/articles/:id/show/edit", ArticleLive.Show, :edit
   end
 
   if Application.compile_env(:realworld_phoenix, :dev_routes) do
@@ -43,6 +38,7 @@ defmodule RealworldPhoenixWeb.Router do
 
   ## Authentication routes
 
+  # ログインユーザでない場合のみアクセス可能
   scope "/", RealworldPhoenixWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
@@ -57,6 +53,7 @@ defmodule RealworldPhoenixWeb.Router do
     post "/users/log_in", UserSessionController, :create
   end
 
+  # ログインユーザのみアクセス可能
   scope "/", RealworldPhoenixWeb do
     pipe_through [:browser, :require_authenticated_user]
 
@@ -64,9 +61,14 @@ defmodule RealworldPhoenixWeb.Router do
       on_mount: [{RealworldPhoenixWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/articles/new", ArticleLive.Index, :new
+      live "/articles/:id/edit", ArticleLive.Index, :edit
+      live "/articles/:id/show/edit", ArticleLive.Show, :edit
     end
   end
 
+  # 全ユーザアクセス可能だが、ログインユーザの情報は参照できる
   scope "/", RealworldPhoenixWeb do
     pipe_through [:browser]
 
@@ -76,6 +78,9 @@ defmodule RealworldPhoenixWeb.Router do
       on_mount: [{RealworldPhoenixWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      live "/articles", ArticleLive.Index, :index
+      live "/articles/:id", ArticleLive.Show, :show
     end
   end
 end
