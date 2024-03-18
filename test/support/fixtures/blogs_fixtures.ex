@@ -30,7 +30,8 @@ defmodule RealworldPhoenix.BlogsFixtures do
       attrs
       |> Enum.into(%{
         body: "some body",
-        article_id: article_fixture().id
+        article_id: article_fixture().id,
+        author_id: user_fixture().id
       })
       |> RealworldPhoenix.Blogs.create_comment()
 
