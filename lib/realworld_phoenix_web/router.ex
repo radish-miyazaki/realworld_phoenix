@@ -3,8 +3,6 @@ defmodule RealworldPhoenixWeb.Router do
 
   import RealworldPhoenixWeb.UserAuth
 
-  alias RealworldPhoenixWeb.ArticleLive
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
