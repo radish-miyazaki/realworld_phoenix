@@ -19,6 +19,9 @@
       <:col :let={comment} label="Author">
         <%= comment.author.email %>
       </:col>
+      <:col :let={comment} label="Body">
+        <%= comment.body %>
+      </:col>
     </.table>
     <.simple_form
       :if={@current_user}
