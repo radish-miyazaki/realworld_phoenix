@@ -105,5 +105,27 @@ defmodule RealworldPhoenixWeb.ArticleLiveTest do
       # 削除した記事が一覧に表示されていないことを確認
       refute html =~ "/articles/#{article.id}"
     end
+
+    test "creates comment", %{conn: conn, article: article} do
+      author = user_fixture()
+
+      {:ok, show_live, _html} =
+        conn
+        |> log_in_user(author)
+        |> live(~p"/articles/#{article}")
+
+      assert show_live
+             |> form("#comment-form", comment: %{body: ""})
+             |> render_change() =~ "can&#39;t be blank"
+
+      assert show_live
+             |> form("#comment-form", comment: %{body: "some comment"})
+             |> render_submit()
+
+      html = render(show_live)
+
+      assert html =~ author.email
+      assert html =~ "some comment"
+    end
   end
 end
