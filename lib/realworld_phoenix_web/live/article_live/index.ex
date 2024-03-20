@@ -5,8 +5,19 @@ defmodule RealworldPhoenixWeb.ArticleLive.Index do
   alias RealworldPhoenix.Blogs.Article
 
   @impl true
+  def mount(%{"tag" => tag}, _session, socket) do
+    {:ok,
+     socket
+     |> stream(:articles, Blogs.list_articles_by_tag(tag))
+     |> assign(:tags, Blogs.list_tags())}
+  end
+
+  @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :articles, Blogs.list_articles())}
+    {:ok,
+     socket
+     |> stream(:articles, Blogs.list_articles())
+     |> assign(:tags, Blogs.list_tags())}
   end
 
   @impl true
